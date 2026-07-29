@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MainMenu" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/layout_zero</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="cornerRadius">@dimen/main_padding</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/icon_padding</item>
+        <item name="iconTint">@android:color/black</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+    
+    <style name="SettingsText">
+        <item name="android:layout_width">@dimen/layout_zero</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/settings_text</item>
+        <item name="android:textSize">@dimen/base_text_size</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+    
+    <style name="SettingsRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/layout_for_height</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/main_padding</item>
+        <item name="android:paddingEnd">@dimen/layout_medium</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+</resources>

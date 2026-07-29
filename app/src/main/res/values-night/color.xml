@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="main_screen_bg">@color/black</color>
+    <color name="settings_background">@color/black</color>
+    <color name="settings_text">@color/white</color>
+    <color name="settings_icon">@color/white</color>
+    <color name="search_bg">@color/black</color>
+    <color name="search_hint">@color/black</color>
+    <color name="search_bar_bg">@color/white</color>
+
+
+
+</resources>
