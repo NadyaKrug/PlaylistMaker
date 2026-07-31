@@ -13,6 +13,8 @@
     <color name="search_bg">@color/white</color>
     <color name="search_hint">@color/gray</color>
     <color name="search_bar_bg">@color/light_gray</color>
+    <color name="search_text">@color/black</color>
+
 
 
 
