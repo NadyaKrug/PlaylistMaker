@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue"
+    android:background="@color/main_screen_bg"
     android:orientation="vertical"
     android:paddingLeft="@dimen/main_padding"
     android:paddingRight="@dimen/main_padding"
@@ -16,72 +16,42 @@
 
     <TextView
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="@dimen/layout_height"
             android:paddingTop="10dp"
             android:paddingBottom="12dp"
             android:text="@string/app_name"
             android:textColor="@color/white"
             android:gravity="center_vertical"
             android:textSize="22sp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="@dimen/layout_marginBottom"
+        android:fontFamily="@font/ys_display_medium"
 
         />
 
         <Button
             android:id="@+id/search_button"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/layout_zero"
-            android:layout_weight="1"
-            android:textColor="@color/black"
+            style="@style/MainMenu"
             android:text = "@string/search"
-            android:textSize="@dimen/button_text_size"
-            android:backgroundTint="@color/white"
-            android:textAllCaps="false"
-            app:cornerRadius="@dimen/main_padding"
-            app:icon = "@drawable/ic_search"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/icon_padding"
-            app:iconTint="@android:color/black"
+            app:icon="@drawable/ic_search"
             android:layout_marginBottom="@dimen/main_padding"
-
 
             />
 
     <Button
         android:id="@+id/music_button"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/layout_zero"
-        android:layout_weight="1"
-        android:textColor="@color/black"
         android:text = "@string/media_library"
-        android:textSize="@dimen/button_text_size"
-        android:backgroundTint="@color/white"
-        android:textAllCaps="false"
-        app:cornerRadius="@dimen/main_padding"
         app:icon = "@drawable/ic_music"
-        app:iconGravity="textStart"
-        app:iconPadding="@dimen/icon_padding"
-        app:iconTint="@android:color/black"
+        style="@style/MainMenu"
         android:layout_marginBottom="@dimen/main_padding"
 
         />
 
     <Button
         android:id="@+id/settings_button"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/layout_zero"
-        android:layout_weight="1"
-        android:textColor="@color/black"
         android:text = "@string/settings"
-        android:textSize="@dimen/button_text_size"
-        android:backgroundTint="@color/white"
-        android:textAllCaps="false"
-        app:cornerRadius="@dimen/main_padding"
         app:icon = "@drawable/ic_settings"
-        app:iconGravity="textStart"
-        app:iconPadding="@dimen/icon_padding"
-        app:iconTint="@android:color/black"
-        android:layout_marginBottom="28dp"
+        style="@style/MainMenu"
+        android:layout_marginBottom="@dimen/layout_marginBottom"
 
         />
 

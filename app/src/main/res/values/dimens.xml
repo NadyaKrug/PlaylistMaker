@@ -6,6 +6,8 @@
     <dimen name="layout_medium">12dp</dimen>
     <dimen name="layout_max">24dp</dimen>
     <dimen name="layout_for_height">61dp</dimen>
+    <dimen name="layout_height">56dp</dimen>
+    <dimen name="layout_marginBottom">28dp</dimen>
 
 
 

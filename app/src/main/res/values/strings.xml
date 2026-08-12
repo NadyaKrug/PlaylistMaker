@@ -6,9 +6,14 @@
     <string name="settings" translatable="false">Настройки</string>
     <string name="dark_theme" translatable="false">Темная тема</string>
     <string name="share_app" translatable="false">Поделиться приложением</string>
-    <string name="write_to_support" translatable="false"> Написать в поддержку</string>
+    <string name="write_to_support" translatable="false">Написать в поддержку</string>
     <string name="user_agreement" translatable="false">Пользовательское соглашение</string>
-
+    <string name="practicum_android_developer_url" translatable="false">https://practicum.yandex.ru/profile/android-developer/</string>
+    <string name="practicum_offer_url" translatable="false">https://yandex.ru/legal/practicum_offer/</string>
+    <string name="share_app_text" translatable="false">https://practicum.yandex.ru/profile/android-developer/</string>
+    <string name="support_email" translatable="false">giraffe.n@yandex.ru</string>
+    <string name="support_email_subject" translatable="false">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="support_email_text" translatable="false">Спасибо разработчикам и разработчицам за крутое приложение!</string>
 
 
 
