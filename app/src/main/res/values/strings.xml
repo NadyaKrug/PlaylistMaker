@@ -14,6 +14,11 @@
     <string name="support_email" translatable="false">giraffe.n@yandex.ru</string>
     <string name="support_email_subject" translatable="false">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="support_email_text" translatable="false">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="nothing_found" translatable="false">Ничего не нашлось</string>
+    <string name="refresh" translatable="false">Обновить</string>
+    <string name="server_error" translatable="false">Проблемы со связью
+
+Загрузка не удалась. Проверьте подключение к интернету</string>
 
 
 

@@ -15,6 +15,8 @@
     <color name="search_bar_bg">@color/light_gray</color>
     <color name="search_text">@color/black</color>
     <color name="track_text">@color/black</color>
+    <color name="error_text">@color/black</color>
+
 
 
 

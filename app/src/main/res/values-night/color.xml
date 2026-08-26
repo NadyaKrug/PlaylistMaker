@@ -9,6 +9,7 @@
     <color name="search_bar_bg">@color/white</color>
     <color name="search_text">@color/black</color>
     <color name="track_text">@color/white</color>
+    <color name="error_text">@color/white</color>
 
 
 

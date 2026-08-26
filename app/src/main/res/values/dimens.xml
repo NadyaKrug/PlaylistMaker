@@ -22,6 +22,7 @@
     <dimen name="button_text_size">20sp</dimen>
     <dimen name="base_text_size">16sp</dimen>
     <dimen name="track_text_size">11sp</dimen>
+    <dimen name="text_error">19sp</dimen>
 
 
 </resources>
