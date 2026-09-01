@@ -16,6 +16,8 @@
     <color name="search_text">@color/black</color>
     <color name="track_text">@color/black</color>
     <color name="error_text">@color/black</color>
+    <color name="update_text">@color/white</color>
+    <color name="update">@color/black</color>
 
 
 
