@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/search_bg"
@@ -47,7 +48,9 @@
             android:fontFamily="@font/ys_display_regular"
             android:textColorHint="@color/search_hint"
             android:background="@null"
-            android:textCursorDrawable="@drawable/blue_cursor"/>
+            android:textCursorDrawable="@drawable/blue_cursor"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/>
 
 
 
@@ -73,4 +76,66 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 
+    <LinearLayout
+        android:id="@+id/nothing_found"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/layout_zero"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/layout_max"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_nothing_found_120" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/main_padding"
+            android:fontFamily="@font/ys_display_medium"
+            android:text="@string/nothing_found"
+            android:textAlignment="center"
+            android:textColor="@color/error_text"
+            android:textSize="@dimen/text_error" />
+
+</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/server_error"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/layout_zero"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/layout_max"
+        android:visibility="gone"
+        tools:visibility="gone">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_server_error" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/ys_display_medium"
+            android:text="@string/server_error"
+            android:textAlignment="center"
+            android:textColor="@color/error_text"
+            android:textSize="@dimen/text_error" />
+
+        <Button
+            android:id="@+id/refresh_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/update_text"
+            android:backgroundTint="@color/update"
+            android:layout_marginTop="@dimen/layout_max"
+            android:text="@string/refresh" />
+</LinearLayout>
 </LinearLayout>
