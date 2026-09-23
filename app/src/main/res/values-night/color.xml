@@ -12,6 +12,8 @@
     <color name="error_text">@color/white</color>
     <color name="update_text">@color/black</color>
     <color name="update">@color/white</color>
+    <color name="playlist_text">@color/gray</color>
+
 
 
 

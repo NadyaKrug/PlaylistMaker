@@ -32,4 +32,21 @@
         <item name="android:paddingEnd">@dimen/layout_medium</item>
         <item name="android:orientation">horizontal</item>
     </style>
+
+    <style name="Playlist">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/playlist_text</item>
+        <item name="android:textColor">@color/playlist_text</item>
+    </style>
+
+    <style name="PlaylistValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/playlist_text</item>
+        <item name="android:textColor">@color/error_text</item>
+
+    </style>
 </resources>

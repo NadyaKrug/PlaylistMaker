@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -61,12 +63,21 @@ class SearchActivity : AppCompatActivity() {
             searchHistory.addTrack(track)
             historyAdapter.tracks = searchHistory.read()
             historyAdapter.notifyDataSetChanged()
+
+            val intent = Intent(this, AudioPlayerActivity::class.java).apply {
+                putExtra("TRACK", track)
+            }
+            startActivity(intent)
         }
 
         historyAdapter = Adapter { track ->
             searchHistory.addTrack(track)
             historyAdapter.tracks = searchHistory.read()
             historyAdapter.notifyDataSetChanged()
+            val intent = Intent(this, AudioPlayerActivity::class.java).apply {
+                putExtra("TRACK", track)
+            }
+            startActivity(intent)
         }
 
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -88,10 +99,12 @@ class SearchActivity : AppCompatActivity() {
             searchAdapter.notifyDataSetChanged()
             showSuccess(recyclerView, placeholderNothingFound, placeholderServerError)
 
-            if (editText.hasFocus() && searchHistory.read().isNotEmpty()) {
+            val hasHistory = editText.hasFocus() && searchHistory.read().isNotEmpty()
+            historyLayout.isVisible = hasHistory
+
+            if (hasHistory) {
                 historyAdapter.tracks = searchHistory.read()
                 historyAdapter.notifyDataSetChanged()
-                historyLayout.visibility = View.VISIBLE
             }
         }
 
