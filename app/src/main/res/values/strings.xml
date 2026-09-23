@@ -21,6 +21,11 @@
 Загрузка не удалась. Проверьте подключение к интернету</string>
     <string name="you_search" translatable="false">Вы искали</string>
     <string name="clear_history" translatable="false">Очистить историю</string>
+    <string name="duration" translatable="false">Длительность</string>
+    <string name="album" translatable="false">Альбом</string>
+    <string name="genre" translatable="false">Жанр</string>
+    <string name="country" translatable="false">Страна</string>
+    <string name="year" translatable="false">Год</string>
 
 
 
