@@ -26,10 +26,11 @@ class ViewHolder (itemView : View) : RecyclerView.ViewHolder(itemView){
     }
 
 
-    fun bind (model:TrackInf){
+    fun bind (model:Track){
         trackName.text = model.trackName
         artistName.text = model.artistName
-        trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
+        val millis = model.trackTimeMillis.toLongOrNull() ?: 0L
+        trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(millis)
         val radiusPx = dpToPx(2f, itemView.context)
 
         Glide.with(itemView)

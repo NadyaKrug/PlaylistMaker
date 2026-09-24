@@ -2,7 +2,6 @@ package com.practicum.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -11,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,37 +20,60 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 
 class SearchActivity : AppCompatActivity() {
-    private var searchText: String  =  SEARCH_TEXT_DEF
+    private var searchText: String = SEARCH_TEXT_DEF
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(SEARCH_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    private val trackApiService = retrofit.create<TrackAPI>()
-    private val trackList = ArrayList<TrackInf>()
-    private val trackAdapter = Adapter(trackList)
+    private val trackApiService = retrofit.create(TrackAPI::class.java)
 
+    private lateinit var searchAdapter: Adapter
+    private lateinit var historyAdapter: Adapter
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var historyLayout: LinearLayout
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var placeholderNothingFound: View
+    private lateinit var placeholderServerError: View
+    private lateinit var editText: EditText
 
-
-    override fun onCreate(savedInstanceState: Bundle?, ) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        val editText = findViewById<EditText>(R.id.search_edit_text)
+
+        val sharedPrefs = getSharedPreferences(PRACTICUM_PLAYLIST_MAKER, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+        historyLayout = findViewById(R.id.history_layout)
+        val historyRecyclerView = findViewById<RecyclerView>(R.id.history_recycler_view)
+        val clearHistoryButton = findViewById<Button>(R.id.clear_history_button)
+        editText = findViewById(R.id.search_edit_text)
         val clear = findViewById<ImageView>(R.id.clear_icon)
         val toolBar = findViewById<MaterialToolbar>(R.id.search_toolbar)
-        val recyclerView = findViewById<RecyclerView>(R.id.track_recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = trackAdapter
-        val placeholderNothingFound = findViewById<View>(R.id.nothing_found)
-        val placeholderServerError = findViewById<View>(R.id.server_error)
+        recyclerView = findViewById<RecyclerView>(R.id.track_recycler_view)
+        placeholderNothingFound = findViewById<View>(R.id.nothing_found)
+        placeholderServerError = findViewById<View>(R.id.server_error)
         val refreshButton = findViewById<Button>(R.id.refresh_button)
 
+        searchAdapter = Adapter { track ->
+            searchHistory.addTrack(track)
+            historyAdapter.tracks = searchHistory.read()
+            historyAdapter.notifyDataSetChanged()
+        }
 
+        historyAdapter = Adapter { track ->
+            searchHistory.addTrack(track)
+            historyAdapter.tracks = searchHistory.read()
+            historyAdapter.notifyDataSetChanged()
+        }
 
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = searchAdapter
+
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        historyRecyclerView.adapter = historyAdapter
 
         toolBar.setNavigationOnClickListener {
             finish()
@@ -61,41 +84,71 @@ class SearchActivity : AppCompatActivity() {
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(editText.windowToken, 0)
 
-            trackList.clear()
-            trackAdapter.notifyDataSetChanged()
+            searchAdapter.tracks.clear()
+            searchAdapter.notifyDataSetChanged()
             showSuccess(recyclerView, placeholderNothingFound, placeholderServerError)
 
+            if (editText.hasFocus() && searchHistory.read().isNotEmpty()) {
+                historyAdapter.tracks = searchHistory.read()
+                historyAdapter.notifyDataSetChanged()
+                historyLayout.visibility = View.VISIBLE
+            }
+        }
+
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clear()
+            historyAdapter.tracks.clear()
+            historyAdapter.notifyDataSetChanged()
+            historyLayout.visibility = View.GONE
+        }
+
+        editText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && editText.text.isEmpty() && searchHistory.read().isNotEmpty()) {
+                historyAdapter.tracks = searchHistory.read()
+                historyAdapter.notifyDataSetChanged()
+                historyLayout.visibility = View.VISIBLE
+            } else {
+                historyLayout.visibility = View.GONE
+            }
         }
 
         val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int){
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
+            override fun afterTextChanged(s: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clear.visibility = clearButtonVisibility(s)
-
                 searchText = s.toString()
+
+                if (editText.hasFocus() && s.isNullOrEmpty() && searchHistory.read().isNotEmpty()) {
+                    historyAdapter.tracks = searchHistory.read()
+                    historyAdapter.notifyDataSetChanged()
+                    historyLayout.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                    placeholderNothingFound.visibility = View.GONE
+                    placeholderServerError.visibility = View.GONE
+                } else {
+                    historyLayout.visibility = View.GONE
+                }
             }
         }
 
         editText.addTextChangedListener(textWatcher)
+
         editText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                historyLayout.visibility = View.GONE
                 doSearch(recyclerView, placeholderNothingFound, placeholderServerError)
                 true
             } else {
                 false
             }
         }
+
         refreshButton.setOnClickListener {
             doSearch(recyclerView, placeholderNothingFound, placeholderServerError)
         }
-
     }
 
     private fun doSearch(
@@ -105,14 +158,14 @@ class SearchActivity : AppCompatActivity() {
     ) {
         if (searchText.trim().isEmpty()) return
 
-        trackApiService.search(searchText).enqueue(object : Callback<TrackResponse>{
+        trackApiService.search(searchText).enqueue(object : Callback<TrackResponse> {
             override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
                 if (response.code() == 200) {
-                    trackList.clear()
+                    searchAdapter.tracks.clear()
                     val results = response.body()?.results
                     if (!results.isNullOrEmpty()) {
-                        trackList.addAll(results)
-                        trackAdapter.notifyDataSetChanged()
+                        searchAdapter.tracks.addAll(results)
+                        searchAdapter.notifyDataSetChanged()
                         showSuccess(recyclerView, placeholderNothingFound, placeholderServerError)
                     } else {
                         showEmptyResult(recyclerView, placeholderNothingFound, placeholderServerError)
@@ -122,7 +175,7 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
 
-             override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                 showServerError(recyclerView, placeholderNothingFound, placeholderServerError)
             }
         })
@@ -143,8 +196,8 @@ class SearchActivity : AppCompatActivity() {
         placeholderNothingFound: View,
         placeholderServerError: View
     ) {
-        trackList.clear()
-        trackAdapter.notifyDataSetChanged()
+        searchAdapter.tracks.clear()
+        searchAdapter.notifyDataSetChanged()
         recyclerView.visibility = View.GONE
         placeholderNothingFound.visibility = View.VISIBLE
         placeholderServerError.visibility = View.GONE
@@ -155,8 +208,8 @@ class SearchActivity : AppCompatActivity() {
         placeholderNothingFound: View,
         placeholderServerError: View
     ) {
-        trackList.clear()
-        trackAdapter.notifyDataSetChanged()
+        searchAdapter.tracks.clear()
+        searchAdapter.notifyDataSetChanged()
         recyclerView.visibility = View.GONE
         placeholderNothingFound.visibility = View.GONE
         placeholderServerError.visibility = View.VISIBLE
@@ -176,9 +229,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-
         super.onRestoreInstanceState(savedInstanceState)
-
         searchText = savedInstanceState.getString(SEARCH_TEXT, SEARCH_TEXT_DEF)
         val editText = findViewById<EditText>(R.id.search_edit_text)
         editText.setText(searchText)
@@ -188,6 +239,6 @@ class SearchActivity : AppCompatActivity() {
         private const val SEARCH_TEXT = "SEARCH_TEXT"
         private const val SEARCH_TEXT_DEF = ""
         private const val SEARCH_BASE_URL = "https://itunes.apple.com"
+        private const val PRACTICUM_PLAYLIST_MAKER = "practicum_playlist_maker"
     }
-
 }

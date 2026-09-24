@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 import android.net.Uri
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,8 +16,15 @@ class SettingsActivity : AppCompatActivity() {
 
         val backButton = findViewById<MaterialToolbar>(R.id.settings_toolbar)
         backButton.setOnClickListener {
-            val intent = Intent(this, MainActivity :: class.java)
-            startActivity(intent)
+            finish()
+        }
+
+        val themeSwitch = findViewById<SwitchMaterial>(R.id.theme_switch)
+
+        themeSwitch.isChecked = (applicationContext as App).darkTheme
+
+        themeSwitch.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
         }
 
         val shareButton = findViewById<LinearLayout>(R.id.share_button)

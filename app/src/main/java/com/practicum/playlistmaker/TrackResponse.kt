@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class TrackResponse (
     val resultCount : Int,
-    val results : List<TrackInf>
+    val results : List<Track>
 )
 
 data class TrackInf(

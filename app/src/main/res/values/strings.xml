@@ -19,6 +19,8 @@
     <string name="server_error" translatable="false">Проблемы со связью
 
 Загрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="you_search" translatable="false">Вы искали</string>
+    <string name="clear_history" translatable="false">Очистить историю</string>
 
 
 
