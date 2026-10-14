@@ -1,9 +1,14 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +32,23 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var yearGroup: View
     private lateinit var genreValue: TextView
     private lateinit var countryValue: TextView
+    private lateinit var playButton: ImageButton
+    private lateinit var playBackTime: TextView
+
+    private var playerState = STATE_DEFAULT
+    private var mediaPlayer = MediaPlayer()
+    private val handler = Handler(Looper.getMainLooper())
+    private var previewUrl: String? = null
+
+    private val updateTimerRunnable = object : Runnable {
+        override fun run() {
+            if (playerState == STATE_PLAYING) {
+                playBackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault())
+                    .format(mediaPlayer.currentPosition)
+                handler.postDelayed(this, REFRESH_TIMER_DELAY)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +65,12 @@ class AudioPlayerActivity : AppCompatActivity() {
         yearGroup = findViewById(R.id.year_group)
         genreValue = findViewById(R.id.genre_value)
         countryValue = findViewById(R.id.country_value)
+        playButton = findViewById(R.id.play_button)
+        playBackTime = findViewById(R.id.playback_time)
+
+        playButton.setOnClickListener {
+            playBackControl()
+        }
 
         toolbar.setNavigationOnClickListener {
             finish()
@@ -79,6 +107,9 @@ class AudioPlayerActivity : AppCompatActivity() {
             .centerCrop()
             .transform(RoundedCorners(pxRadius))
             .into(cover)
+
+        previewUrl = track.previewUrl
+        preparePlayer()
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {
@@ -87,5 +118,67 @@ class AudioPlayerActivity : AppCompatActivity() {
             dp,
             context.resources.displayMetrics
         ).toInt()
+    }
+
+    private fun preparePlayer() {
+        if (previewUrl.isNullOrEmpty()) return
+
+        mediaPlayer.setDataSource(previewUrl)
+        mediaPlayer.prepareAsync()
+
+        mediaPlayer.setOnPreparedListener {
+            playButton.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+
+        mediaPlayer.setOnCompletionListener {
+            playerState = STATE_PREPARED
+            handler.removeCallbacks(updateTimerRunnable)
+            playButton.setImageResource(R.drawable.ic_play_button_100_100)
+            playBackTime.text = "00:00"
+        }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        playButton.setImageResource(R.drawable.ic_stop_83_83)
+        playerState = STATE_PLAYING
+        handler.post(updateTimerRunnable)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        playButton.setImageResource(R.drawable.ic_play_button_100_100)
+        playerState = STATE_PAUSED
+        handler.removeCallbacks(updateTimerRunnable)
+    }
+
+    private fun playBackControl() {
+        when (playerState) {
+            STATE_PLAYING -> pausePlayer()
+            STATE_PREPARED, STATE_PAUSED -> startPlayer()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (playerState == STATE_PLAYING) {
+            pausePlayer()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        handler.removeCallbacks(updateTimerRunnable)
+    }
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+
+        private const val REFRESH_TIMER_DELAY = 300L
     }
 }
