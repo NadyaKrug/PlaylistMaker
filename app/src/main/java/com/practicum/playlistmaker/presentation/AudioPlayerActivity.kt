@@ -1,13 +1,11 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation
 
 import android.content.Context
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.TypedValue
 import android.view.View
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,6 +14,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -36,15 +37,16 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var playBackTime: TextView
 
     private var playerState = STATE_DEFAULT
-    private var mediaPlayer = MediaPlayer()
     private val handler = Handler(Looper.getMainLooper())
     private var previewUrl: String? = null
+
+    private val playerInteractor = Creator.providePlayerInteractor()
 
     private val updateTimerRunnable = object : Runnable {
         override fun run() {
             if (playerState == STATE_PLAYING) {
                 playBackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault())
-                    .format(mediaPlayer.currentPosition)
+                    .format(playerInteractor.getCurrentPosition())
                 handler.postDelayed(this, REFRESH_TIMER_DELAY)
             }
         }
@@ -81,7 +83,6 @@ class AudioPlayerActivity : AppCompatActivity() {
             bindTrack(track)
         }
     }
-
 
     private fun bindTrack(track: Track) {
         trackName.text = track.trackName
@@ -123,31 +124,30 @@ class AudioPlayerActivity : AppCompatActivity() {
     private fun preparePlayer() {
         if (previewUrl.isNullOrEmpty()) return
 
-        mediaPlayer.setDataSource(previewUrl)
-        mediaPlayer.prepareAsync()
-
-        mediaPlayer.setOnPreparedListener {
-            playButton.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-
-        mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
-            handler.removeCallbacks(updateTimerRunnable)
-            playButton.setImageResource(R.drawable.ic_play_button_100_100)
-            playBackTime.text = "00:00"
-        }
+        playerInteractor.preparePlayer(
+            url = previewUrl!!,
+            onPrepared = {
+                playButton.isEnabled = true
+                playerState = STATE_PREPARED
+            },
+            onCompletion = {
+                playerState = STATE_PREPARED
+                handler.removeCallbacks(updateTimerRunnable)
+                playButton.setImageResource(R.drawable.ic_play_button_100_100)
+                playBackTime.text = "00:00"
+            }
+        )
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        playerInteractor.startPlayer()
         playButton.setImageResource(R.drawable.ic_stop_83_83)
         playerState = STATE_PLAYING
         handler.post(updateTimerRunnable)
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
+        playerInteractor.pausePlayer()
         playButton.setImageResource(R.drawable.ic_play_button_100_100)
         playerState = STATE_PAUSED
         handler.removeCallbacks(updateTimerRunnable)
@@ -169,7 +169,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        playerInteractor.releasePlayer()
         handler.removeCallbacks(updateTimerRunnable)
     }
 

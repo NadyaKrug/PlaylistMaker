@@ -1,6 +1,7 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.data.dto
 
 import com.google.gson.annotations.SerializedName
+import com.practicum.playlistmaker.domain.model.Track
 
 data class TrackResponse (
     val resultCount : Int,

@@ -1,6 +1,5 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -20,21 +19,16 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.practicum.playlistmaker.presentation.AudioPlayerActivity
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.data.repository.SearchHistory
+import com.practicum.playlistmaker.domain.api.TracksInteractor
+import com.practicum.playlistmaker.domain.model.Track
+import kotlin.collections.isNotEmpty
 
 class SearchActivity : AppCompatActivity() {
     private var searchText: String = SEARCH_TEXT_DEF
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(SEARCH_BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val trackApiService = retrofit.create(TrackAPI::class.java)
 
     private lateinit var searchAdapter: Adapter
     private lateinit var historyAdapter: Adapter
@@ -45,8 +39,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderServerError: View
     private lateinit var editText: EditText
     private lateinit var progressBar: ProgressBar
+
+    private val tracksInteractor = Creator.provideTracksInteractor(this)
+
     private var isClickAllowed = true
-    private val handler =   Handler(Looper.getMainLooper())
+    private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { doSearch() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,7 +102,7 @@ class SearchActivity : AppCompatActivity() {
         clear.setOnClickListener {
             handler.removeCallbacks(searchRunnable)
             editText.setText("")
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(editText.windowToken, 0)
 
             searchAdapter.tracks.clear()
@@ -182,36 +179,26 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun doSearch(
-    ) {
-
+    private fun doSearch() {
         if (searchText.trim().isEmpty()) return
         progressBar.isVisible = true
         recyclerView.isVisible = false
         placeholderNothingFound.isVisible = false
         placeholderServerError.isVisible = false
 
-        trackApiService.search(searchText).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                progressBar.isVisible = false
-                if (response.code() == 200) {
-                    searchAdapter.tracks.clear()
-                    val results = response.body()?.results
-                    if (!results.isNullOrEmpty()) {
-                        searchAdapter.tracks.addAll(results)
+        tracksInteractor.searchTracks(searchText, object : TracksInteractor.TracksConsumer {
+            override fun consume(tracks: List<Track>?, errorMessage: String?) {
+                runOnUiThread {
+                    progressBar.isVisible = false
+                    if (tracks != null) {
+                        searchAdapter.tracks.clear()
+                        searchAdapter.tracks.addAll(tracks)
                         searchAdapter.notifyDataSetChanged()
                         showSuccess(recyclerView, placeholderNothingFound, placeholderServerError)
-                    } else {
-                        showEmptyResult(recyclerView, placeholderNothingFound, placeholderServerError)
+                    } else if (errorMessage != null) {
+                        showServerError(recyclerView, placeholderNothingFound, placeholderServerError)
                     }
-                } else {
-                    showServerError(recyclerView, placeholderNothingFound, placeholderServerError)
                 }
-            }
-
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                progressBar.isVisible = false
-                showServerError(recyclerView, placeholderNothingFound, placeholderServerError)
             }
         })
     }
@@ -258,16 +245,16 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun searchDebounce(){
+    private fun searchDebounce() {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
-    private fun clickDebounce(): Boolean{
+    private fun clickDebounce(): Boolean {
         val current = isClickAllowed
-        if(isClickAllowed){
+        if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({isClickAllowed = true}, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
         }
         return current
     }
@@ -292,7 +279,6 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_TEXT = "SEARCH_TEXT"
         private const val SEARCH_TEXT_DEF = ""
-        private const val SEARCH_BASE_URL = "https://itunes.apple.com"
         private const val PRACTICUM_PLAYLIST_MAKER = "practicum_playlist_maker"
 
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
