@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.domain.model
 
 import java.io.Serializable
 
@@ -14,7 +14,7 @@ data class Track (
     val country : String,
     val previewUrl : String
 
-) : Serializable {
+) : Serializable  {
     fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
 
     fun getRealeasedDate() : String? {

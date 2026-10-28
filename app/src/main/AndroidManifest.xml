@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,13 +24,13 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".MusicActivity"
+        <activity android:name=".presentation.MusicActivity"
             android:exported="false"/>
-        <activity android:name=".SearchActivity"
+        <activity android:name=".presentation.SearchActivity"
             android:exported="false"/>
-        <activity android:name=".SettingsActivity"
+        <activity android:name=".presentation.SettingsActivity"
             android:exported="false"/>
-        <activity android:name=".AudioPlayerActivity"
+        <activity android:name=".presentation.AudioPlayerActivity"
             android:exported="false"/>
     </application>
 
