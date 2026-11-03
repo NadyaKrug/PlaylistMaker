@@ -1,15 +1,19 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import com.google.gson.Gson
 import com.practicum.playlistmaker.data.dto.TrackAPI
+import com.practicum.playlistmaker.data.repository.HistoryRepositoryImpl
 import com.practicum.playlistmaker.data.repository.PlayerRepositoryImpl
 import com.practicum.playlistmaker.data.repository.SettingsRepositoryImpl
 import com.practicum.playlistmaker.data.repository.SharingRepositoryImpl
 import com.practicum.playlistmaker.data.repository.TracksRepositoryImpl
+import com.practicum.playlistmaker.domain.api.HistoryInteractor
 import com.practicum.playlistmaker.domain.api.SettingsRepository
 import com.practicum.playlistmaker.domain.api.SharingRepository
 import com.practicum.playlistmaker.domain.api.TracksInteractor
 import com.practicum.playlistmaker.domain.api.TracksRepository
+import com.practicum.playlistmaker.domain.impl.HistoryInteractorImpl
 import com.practicum.playlistmaker.domain.impl.SettingsInteractorImpl
 import com.practicum.playlistmaker.domain.impl.SharingInteractorImpl
 import com.practicum.playlistmaker.domain.impl.TracksInteractorImpl
@@ -49,5 +53,11 @@ object Creator {
 
     fun providePlayerInteractor(): com.practicum.playlistmaker.domain.api.PlayerInteractor {
         return com.practicum.playlistmaker.domain.impl.PlayerInteractorImpl(PlayerRepositoryImpl())
+    }
+
+    fun provideHistoryInteractor(context: Context): HistoryInteractor {
+        val sharedPrefs = context.getSharedPreferences("playlist_maker_preferences", Context.MODE_PRIVATE)
+        val historyRepository = HistoryRepositoryImpl(sharedPrefs, Gson())
+        return HistoryInteractorImpl(historyRepository)
     }
 }
