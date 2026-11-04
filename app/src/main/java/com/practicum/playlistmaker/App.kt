@@ -2,10 +2,9 @@ package com.practicum.playlistmaker
 
 import android.app.Application
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 
-const val PRACTICUM_PLAYLIST_MAKER = "playlist_maker_preferences"
+const val PRACTICUM_PLAYLIST_MAKER = "practicum_playlist_maker"
 const val DARK_THEME_KEY = "dark_theme_key"
 
 class App : Application() {

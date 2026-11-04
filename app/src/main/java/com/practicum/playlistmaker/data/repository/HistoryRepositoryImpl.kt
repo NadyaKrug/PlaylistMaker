@@ -17,15 +17,10 @@ class HistoryRepositoryImpl(
         return gson.fromJson(json, type)
     }
 
-    override fun addTrack(track: Track) {
-        val history = getHistory().toMutableList()
-        history.removeIf { it.trackId == track.trackId }
-        history.add(0, track)
-        if (history.size > 10) {
-            history.removeAt(history.size - 1)
-        }
+    override fun saveHistory(tracks: List<Track>) {
+        val json = gson.toJson(tracks)
         sharedPreferences.edit()
-            .putString(SEARCH_HISTORY_KEY, gson.toJson(history))
+            .putString(SEARCH_HISTORY_KEY, json)
             .apply()
     }
 

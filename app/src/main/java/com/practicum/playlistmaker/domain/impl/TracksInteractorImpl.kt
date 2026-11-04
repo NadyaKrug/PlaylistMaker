@@ -11,8 +11,16 @@ class TracksInteractorImpl(
     override fun searchTracks(expression: String, consumer: TracksInteractor.TracksConsumer) {
         repository.searchTracks(expression, object : TracksRepository.TracksConsumer {
             override fun consume(tracks: List<Track>?) {
-                consumer.consume(tracks, null)
+                if (tracks == null) {
+                    consumer.consume(null, ERROR_MARKER)
+                } else {
+                    consumer.consume(tracks, null)
+                }
             }
         })
+    }
+
+    companion object {
+        private const val ERROR_MARKER = "SERVER_ERROR"
     }
 }

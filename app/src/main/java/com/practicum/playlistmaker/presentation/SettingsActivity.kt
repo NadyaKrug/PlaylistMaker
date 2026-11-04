@@ -8,6 +8,8 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.Creator
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.api.SettingsInteractor
+import com.practicum.playlistmaker.domain.api.SharingInteractor
 import com.practicum.playlistmaker.domain.model.ThemeSettings
 
 class SettingsActivity : AppCompatActivity() {
@@ -15,8 +17,8 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val settingsInteractor = Creator.provideSettingsInteractor(this)
-        val sharingInteractor = Creator.provideSharingInteractor(this)
+        val settingsInteractor: SettingsInteractor = Creator.provideSettingsInteractor(this)
+        val sharingInteractor: SharingInteractor = Creator.provideSharingInteractor(this)
 
         val backButton = findViewById<MaterialToolbar>(R.id.settings_toolbar)
         backButton.setOnClickListener {

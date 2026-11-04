@@ -9,7 +9,9 @@ import com.practicum.playlistmaker.data.repository.SettingsRepositoryImpl
 import com.practicum.playlistmaker.data.repository.SharingRepositoryImpl
 import com.practicum.playlistmaker.data.repository.TracksRepositoryImpl
 import com.practicum.playlistmaker.domain.api.HistoryInteractor
+import com.practicum.playlistmaker.domain.api.SettingsInteractor
 import com.practicum.playlistmaker.domain.api.SettingsRepository
+import com.practicum.playlistmaker.domain.api.SharingInteractor
 import com.practicum.playlistmaker.domain.api.SharingRepository
 import com.practicum.playlistmaker.domain.api.TracksInteractor
 import com.practicum.playlistmaker.domain.api.TracksRepository
@@ -25,7 +27,7 @@ object Creator {
         return SettingsRepositoryImpl(sharedPrefs)
     }
 
-    fun provideSettingsInteractor(context: Context): SettingsInteractorImpl {
+    fun provideSettingsInteractor(context: Context): SettingsInteractor {
         return SettingsInteractorImpl(getSettingsRepository(context))
     }
 
@@ -33,7 +35,7 @@ object Creator {
         return SharingRepositoryImpl(context)
     }
 
-    fun provideSharingInteractor(context: Context): SharingInteractorImpl {
+    fun provideSharingInteractor(context: Context): SharingInteractor {
         return SharingInteractorImpl(getSharingRepository(context))
     }
 

@@ -131,6 +131,7 @@ class SearchActivity : AppCompatActivity() {
                 historyAdapter.tracks = ArrayList(historyInteractor.getHistory())
                 historyAdapter.notifyDataSetChanged()
                 historyLayout.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
             } else {
                 historyLayout.visibility = View.GONE
             }
