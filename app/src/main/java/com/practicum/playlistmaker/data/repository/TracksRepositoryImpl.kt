@@ -30,12 +30,12 @@ class TracksRepositoryImpl(private val trackApiService: TrackAPI) : TracksReposi
                     }
                     consumer.consume(results ?: emptyList())
                 } else {
-                    consumer.consume(emptyList())
+                    consumer.consume(null)
                 }
             }
 
             override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                consumer.consume(emptyList())
+                consumer.consume(null)
             }
         })
     }

@@ -67,6 +67,14 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/track_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/main_padding"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
         <LinearLayout
             android:id="@+id/history_layout"
             android:layout_width="match_parent"
@@ -89,7 +97,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/history_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="@dimen/layout_zero"
                 android:layout_weight="1" />
 
             <Button
@@ -110,12 +118,6 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/track_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/main_padding"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         <LinearLayout
             android:id="@+id/nothing_found"

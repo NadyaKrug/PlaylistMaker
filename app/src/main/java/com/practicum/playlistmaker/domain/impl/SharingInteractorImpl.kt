@@ -1,18 +1,18 @@
 package com.practicum.playlistmaker.domain.impl
 
+import com.practicum.playlistmaker.domain.api.SharingInteractor
 import com.practicum.playlistmaker.domain.api.SharingRepository
 
-class SharingInteractorImpl (private val sharingRepository: SharingRepository) {
-
-    fun shareApp(){
+class SharingInteractorImpl(private val sharingRepository: SharingRepository) : SharingInteractor {
+    override fun shareApp() {
         sharingRepository.shareApp()
     }
 
-    fun openTerms(){
+    override fun openTerms() {
         sharingRepository.openTerms()
     }
 
-    fun openSupport(){
+    override fun openSupport() {
         sharingRepository.openSupport()
     }
 }

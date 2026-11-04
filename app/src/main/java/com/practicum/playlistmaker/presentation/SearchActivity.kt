@@ -19,20 +19,18 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import com.practicum.playlistmaker.presentation.AudioPlayerActivity
 import com.practicum.playlistmaker.Creator
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.data.repository.SearchHistory
+import com.practicum.playlistmaker.domain.api.HistoryInteractor
 import com.practicum.playlistmaker.domain.api.TracksInteractor
 import com.practicum.playlistmaker.domain.model.Track
-import kotlin.collections.isNotEmpty
 
 class SearchActivity : AppCompatActivity() {
     private var searchText: String = SEARCH_TEXT_DEF
 
     private lateinit var searchAdapter: Adapter
     private lateinit var historyAdapter: Adapter
-    private lateinit var searchHistory: SearchHistory
+    private lateinit var historyInteractor: HistoryInteractor
     private lateinit var historyLayout: LinearLayout
     private lateinit var recyclerView: RecyclerView
     private lateinit var placeholderNothingFound: View
@@ -50,8 +48,8 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val sharedPrefs = getSharedPreferences(PRACTICUM_PLAYLIST_MAKER, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPrefs)
+        historyInteractor = Creator.provideHistoryInteractor(this)
+
         historyLayout = findViewById(R.id.history_layout)
         val historyRecyclerView = findViewById<RecyclerView>(R.id.history_recycler_view)
         val clearHistoryButton = findViewById<Button>(R.id.clear_history_button)
@@ -66,8 +64,8 @@ class SearchActivity : AppCompatActivity() {
 
         searchAdapter = Adapter { track ->
             if (clickDebounce()) {
-                searchHistory.addTrack(track)
-                historyAdapter.tracks = searchHistory.read()
+                historyInteractor.addTrack(track)
+                historyAdapter.tracks = ArrayList(historyInteractor.getHistory())
                 historyAdapter.notifyDataSetChanged()
 
                 val intent = Intent(this, AudioPlayerActivity::class.java).apply {
@@ -79,9 +77,10 @@ class SearchActivity : AppCompatActivity() {
 
         historyAdapter = Adapter { track ->
             if (clickDebounce()) {
-                searchHistory.addTrack(track)
-                historyAdapter.tracks = searchHistory.read()
+                historyInteractor.addTrack(track)
+                historyAdapter.tracks = ArrayList(historyInteractor.getHistory())
                 historyAdapter.notifyDataSetChanged()
+
                 val intent = Intent(this, AudioPlayerActivity::class.java).apply {
                     putExtra("TRACK", track)
                 }
@@ -109,27 +108,30 @@ class SearchActivity : AppCompatActivity() {
             searchAdapter.notifyDataSetChanged()
             showSuccess(recyclerView, placeholderNothingFound, placeholderServerError)
 
-            val hasHistory = editText.hasFocus() && searchHistory.read().isNotEmpty()
+            val historyList = historyInteractor.getHistory()
+            val hasHistory = editText.hasFocus() && historyList.isNotEmpty()
             historyLayout.isVisible = hasHistory
 
             if (hasHistory) {
-                historyAdapter.tracks = searchHistory.read()
+                historyAdapter.tracks = ArrayList(historyInteractor.getHistory())
                 historyAdapter.notifyDataSetChanged()
             }
         }
 
         clearHistoryButton.setOnClickListener {
-            searchHistory.clear()
+            historyInteractor.clearHistory()
             historyAdapter.tracks.clear()
             historyAdapter.notifyDataSetChanged()
             historyLayout.visibility = View.GONE
         }
 
         editText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && editText.text.isEmpty() && searchHistory.read().isNotEmpty()) {
-                historyAdapter.tracks = searchHistory.read()
+            val historyList = historyInteractor.getHistory()
+            if (hasFocus && editText.text.isEmpty() && historyList.isNotEmpty()) {
+                historyAdapter.tracks = ArrayList(historyInteractor.getHistory())
                 historyAdapter.notifyDataSetChanged()
                 historyLayout.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
             } else {
                 historyLayout.visibility = View.GONE
             }
@@ -144,8 +146,9 @@ class SearchActivity : AppCompatActivity() {
                 clear.visibility = clearButtonVisibility(s)
                 searchText = s.toString()
 
-                if (editText.hasFocus() && s.isNullOrEmpty() && searchHistory.read().isNotEmpty()) {
-                    historyAdapter.tracks = searchHistory.read()
+                val historyList = historyInteractor.getHistory()
+                if (editText.hasFocus() && s.isNullOrEmpty() && historyList.isNotEmpty()) {
+                    historyAdapter.tracks = ArrayList(historyInteractor.getHistory())
                     historyAdapter.notifyDataSetChanged()
                     historyLayout.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
@@ -155,7 +158,6 @@ class SearchActivity : AppCompatActivity() {
                     handler.removeCallbacks(searchRunnable)
                 } else {
                     historyLayout.visibility = View.GONE
-                    historyLayout.isVisible = false
                     searchDebounce()
                 }
             }
@@ -190,13 +192,16 @@ class SearchActivity : AppCompatActivity() {
             override fun consume(tracks: List<Track>?, errorMessage: String?) {
                 runOnUiThread {
                     progressBar.isVisible = false
-                    if (tracks != null) {
+
+                    if (!errorMessage.isNullOrEmpty()) {
+                        showServerError(recyclerView, placeholderNothingFound, placeholderServerError)
+                    } else if (tracks != null && tracks.isNotEmpty()) {
                         searchAdapter.tracks.clear()
                         searchAdapter.tracks.addAll(tracks)
                         searchAdapter.notifyDataSetChanged()
                         showSuccess(recyclerView, placeholderNothingFound, placeholderServerError)
-                    } else if (errorMessage != null) {
-                        showServerError(recyclerView, placeholderNothingFound, placeholderServerError)
+                    } else {
+                        showEmptyResult(recyclerView, placeholderNothingFound, placeholderServerError)
                     }
                 }
             }
@@ -279,7 +284,6 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_TEXT = "SEARCH_TEXT"
         private const val SEARCH_TEXT_DEF = ""
-        private const val PRACTICUM_PLAYLIST_MAKER = "practicum_playlist_maker"
 
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
