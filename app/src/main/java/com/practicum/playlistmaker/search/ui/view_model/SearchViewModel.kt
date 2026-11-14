@@ -1,6 +1,8 @@
 package com.practicum.playlistmaker.search.ui.view_model
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,6 +24,13 @@ class SearchViewModel(
     fun observeState(): LiveData<SearchState> = _stateLiveData
 
     private var latestSearchText: String? = null
+    private val searchRunnable = Runnable {
+        val currentText = latestSearchText
+        if (!currentText.isNullOrBlank()) {
+            searchTracks(currentText)
+        }
+    }
+    private val handler = Handler(Looper.getMainLooper())
 
     init {
         loadHistory()
@@ -48,7 +57,8 @@ class SearchViewModel(
             return
         }
         latestSearchText = changedText
-        searchTracks(changedText)
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     fun searchTracks(searchText: String) {
@@ -81,6 +91,7 @@ class SearchViewModel(
     }
 
     companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
         fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
