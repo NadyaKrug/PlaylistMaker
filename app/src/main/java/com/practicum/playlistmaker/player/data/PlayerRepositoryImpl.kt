@@ -5,38 +5,46 @@ import com.practicum.playlistmaker.player.domain.PlayerRepository
 
 class PlayerRepositoryImpl : PlayerRepository {
 
-    private var mediaPlayer = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = MediaPlayer()
     private var playerState = STATE_DEFAULT
 
     override fun preparePlayer(url: String, onPrepared: () -> Unit, onCompletion: () -> Unit) {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
+        val player = mediaPlayer ?: MediaPlayer().also { mediaPlayer = it }
+        player.reset()
+        player.setDataSource(url)
+        player.prepareAsync()
+        player.setOnPreparedListener {
             playerState = STATE_PREPARED
             onPrepared()
         }
-        mediaPlayer.setOnCompletionListener {
+        player.setOnCompletionListener {
             playerState = STATE_PREPARED
             onCompletion()
         }
     }
 
     override fun startPlayer() {
-        mediaPlayer.start()
-        playerState = STATE_PLAYING
+        if (playerState == STATE_PREPARED || playerState == STATE_PAUSED) {
+            mediaPlayer?.start()
+            playerState = STATE_PLAYING
+        }
     }
 
     override fun pausePlayer() {
-        mediaPlayer.pause()
-        playerState = STATE_PAUSED
+        if (playerState == STATE_PLAYING) {
+            mediaPlayer?.pause()
+            playerState = STATE_PAUSED
+        }
     }
 
     override fun releasePlayer() {
-        mediaPlayer.release()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        playerState = STATE_DEFAULT
     }
 
     override fun getCurrentPosition(): Int {
-        return mediaPlayer.currentPosition
+        return mediaPlayer?.currentPosition ?: 0
     }
 
     override fun isPlaying(): Boolean {
