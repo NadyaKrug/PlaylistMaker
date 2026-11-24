@@ -2,19 +2,18 @@ package com.practicum.playlistmaker.main.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.main.ui.view_model.MainViewModel
 import com.practicum.playlistmaker.player.ui.activity.MusicActivity
 import com.practicum.playlistmaker.search.ui.activity.SearchActivity
 import com.practicum.playlistmaker.settings.ui.activity.SettingsActivity
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,20 +23,15 @@ class MainActivity : AppCompatActivity() {
         val musicButton = findViewById<Button>(R.id.music_button)
         val settingsButton = findViewById<Button>(R.id.settings_button)
 
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
-
-        searchButton.setOnClickListener{
+        searchButton.setOnClickListener {
             viewModel.onSearchClicked()
         }
 
         musicButton.setOnClickListener {
-
             viewModel.onMediaLibraryClicked()
         }
 
         settingsButton.setOnClickListener {
-
             viewModel.onSettingsClicked()
         }
 
@@ -59,9 +53,5 @@ class MainActivity : AppCompatActivity() {
                 viewModel.onMediaLibraryNavigated()
             }
         }
-
     }
-
-
-
 }

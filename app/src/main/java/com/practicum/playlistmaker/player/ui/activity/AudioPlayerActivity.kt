@@ -10,19 +10,24 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.ui.PlayerState
 import com.practicum.playlistmaker.player.ui.view_model.PlayerViewModel
 import com.practicum.playlistmaker.search.domain.model.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: PlayerViewModel
+    private var previewUrl: String = ""
+    private val viewModel by viewModel<PlayerViewModel> {
+        parametersOf(previewUrl)
+    }
+
     private lateinit var playButton: ImageButton
     private lateinit var playBackTime: TextView
 
@@ -36,12 +41,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_audio_player)
 
         val track = intent.getSerializableExtra("TRACK") as? Track
-        val previewUrl = track?.previewUrl ?: ""
-
-        viewModel = ViewModelProvider(
-            this,
-            PlayerViewModel.getFactory(previewUrl)
-        )[PlayerViewModel::class.java]
+        previewUrl = track?.previewUrl ?: ""
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         val cover = findViewById<ImageView>(R.id.cover)
