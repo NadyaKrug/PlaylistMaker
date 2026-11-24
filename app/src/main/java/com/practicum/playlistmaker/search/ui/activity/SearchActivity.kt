@@ -16,7 +16,6 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -24,10 +23,12 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.ui.activity.AudioPlayerActivity
 import com.practicum.playlistmaker.search.ui.SearchState
 import com.practicum.playlistmaker.search.ui.view_model.SearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel by viewModel<SearchViewModel>()
+
     private lateinit var searchAdapter: Adapter
     private lateinit var historyAdapter: Adapter
     private lateinit var historyLayout: LinearLayout
@@ -43,10 +44,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModel.Companion.getFactory()
-        )[SearchViewModel::class.java]
 
         historyLayout = findViewById(R.id.history_layout)
         val historyRecyclerView = findViewById<RecyclerView>(R.id.history_recycler_view)
